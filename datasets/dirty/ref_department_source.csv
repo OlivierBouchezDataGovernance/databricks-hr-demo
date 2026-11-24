@@ -1,0 +1,11 @@
+department_id;dept_name;dept_mngr_rating;dept_size
+1;accounting;low;<1000
+2;hr;medium;<1000
+3;IT;medium;[1000 - 3000]
+4;management;high;<1000
+5;marketing;low;<1000
+6;product_mng;medium;<1000
+7;RandD;high;<1000
+8;support;high;[1000 - 3000]
+9;technical;low;[1000 - 3000]
+10;sales;high;>3000

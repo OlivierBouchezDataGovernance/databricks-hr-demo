@@ -1,0 +1,764 @@
+{
+ "datasets": [
+  {
+   "name": "emp",
+   "displayName": "Employés",
+   "queryLines": [
+    "SELECT has_left, CASE has_left WHEN 1 THEN 'Parti' ELSE 'Resté' END AS statut,\n",
+    "  satisfaction_level, last_evaluation, average_monthly_hours,\n",
+    "  CAST(number_project AS STRING) AS projets,\n",
+    "  lpad(CAST(time_spend_company AS STRING), 2, '0') AS annees,\n",
+    "  CASE WHEN average_monthly_hours <= 130 THEN '091-130' WHEN average_monthly_hours <= 160 THEN '131-160'\n",
+    "       WHEN average_monthly_hours <= 190 THEN '161-190' WHEN average_monthly_hours <= 220 THEN '191-220'\n",
+    "       WHEN average_monthly_hours <= 250 THEN '221-250' WHEN average_monthly_hours <= 280 THEN '251-280'\n",
+    "       ELSE '281-310' END AS heures,\n",
+    "  CASE promotion_last_5years WHEN 1 THEN 'Promu' ELSE 'Non promu' END AS promotion,\n",
+    "  CASE WHEN satisfaction_level <= 0.11 AND last_evaluation >= 0.77 THEN 'Surchargés et malheureux'\n",
+    "       WHEN satisfaction_level BETWEEN 0.36 AND 0.46 AND last_evaluation BETWEEN 0.45 AND 0.57 THEN 'Sous-employés'\n",
+    "       WHEN satisfaction_level BETWEEN 0.72 AND 0.92 AND last_evaluation >= 0.80 THEN 'Performants et satisfaits'\n",
+    "       ELSE 'Autres' END AS profil\n",
+    "FROM workspace.hr_demo.hr_employee\n"
+   ]
+  }
+ ],
+ "pages": [
+  {
+   "name": "departs",
+   "displayName": "Départs",
+   "pageType": "PAGE_TYPE_CANVAS",
+   "layout": [
+    {
+     "widget": {
+      "name": "titre",
+      "multilineTextboxSpec": {
+       "lines": [
+        "# Pourquoi les employés partent-ils ?\n",
+        "Jeu de démonstration, 14 999 lignes. Choisissez un filtre : tous les graphiques suivent."
+       ]
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 0,
+      "width": 6,
+      "height": 2
+     }
+    },
+    {
+     "widget": {
+      "name": "f1",
+      "queries": [
+       {
+        "name": "f_projets",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "projets",
+           "expression": "`projets`"
+          },
+          {
+           "name": "projets_associativity",
+           "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "filter-multi-select",
+       "encodings": {
+        "fields": [
+         {
+          "fieldName": "projets",
+          "displayName": "Nombre de projets",
+          "queryName": "f_projets"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Nombre de projets"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 2,
+      "width": 2,
+      "height": 2
+     }
+    },
+    {
+     "widget": {
+      "name": "f2",
+      "queries": [
+       {
+        "name": "f_annees",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "annees",
+           "expression": "`annees`"
+          },
+          {
+           "name": "annees_associativity",
+           "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "filter-multi-select",
+       "encodings": {
+        "fields": [
+         {
+          "fieldName": "annees",
+          "displayName": "Années dans l'entreprise",
+          "queryName": "f_annees"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Années dans l'entreprise"
+       }
+      }
+     },
+     "position": {
+      "x": 2,
+      "y": 2,
+      "width": 2,
+      "height": 2
+     }
+    },
+    {
+     "widget": {
+      "name": "f3",
+      "queries": [
+       {
+        "name": "f_promotion",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "promotion",
+           "expression": "`promotion`"
+          },
+          {
+           "name": "promotion_associativity",
+           "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "filter-multi-select",
+       "encodings": {
+        "fields": [
+         {
+          "fieldName": "promotion",
+          "displayName": "Promotion",
+          "queryName": "f_promotion"
+         }
+        ]
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Promotion"
+       }
+      }
+     },
+     "position": {
+      "x": 4,
+      "y": 2,
+      "width": 2,
+      "height": 2
+     }
+    },
+    {
+     "widget": {
+      "name": "k1",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "v",
+           "expression": "COUNT(`*`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "counter",
+       "encodings": {
+        "value": {
+         "fieldName": "v",
+         "format": {
+          "type": "number",
+          "abbreviation": "none",
+          "decimalPlaces": {
+           "type": "max",
+           "places": 0
+          }
+         },
+         "displayName": "Employés"
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Employés"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 4,
+      "width": 2,
+      "height": 3
+     }
+    },
+    {
+     "widget": {
+      "name": "k2",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "v",
+           "expression": "SUM(`has_left`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "counter",
+       "encodings": {
+        "value": {
+         "fieldName": "v",
+         "format": {
+          "type": "number",
+          "abbreviation": "none",
+          "decimalPlaces": {
+           "type": "max",
+           "places": 0
+          }
+         },
+         "displayName": "Partis"
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Partis"
+       }
+      }
+     },
+     "position": {
+      "x": 2,
+      "y": 4,
+      "width": 2,
+      "height": 3
+     }
+    },
+    {
+     "widget": {
+      "name": "k3",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "v",
+           "expression": "AVG(`has_left`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 2,
+       "widgetType": "counter",
+       "encodings": {
+        "value": {
+         "fieldName": "v",
+         "format": {
+          "type": "number-percent",
+          "decimalPlaces": {
+           "type": "max",
+           "places": 1
+          }
+         },
+         "displayName": "Taux de départ"
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Taux de départ"
+       }
+      }
+     },
+     "position": {
+      "x": 4,
+      "y": 4,
+      "width": 2,
+      "height": 3
+     }
+    },
+    {
+     "widget": {
+      "name": "b1",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "projets",
+           "expression": "`projets`"
+          },
+          {
+           "name": "taux",
+           "expression": "AVG(`has_left`)"
+          },
+          {
+           "name": "n",
+           "expression": "COUNT(`*`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 3,
+       "widgetType": "bar",
+       "encodings": {
+        "x": {
+         "fieldName": "projets",
+         "scale": {
+          "type": "categorical",
+          "sort": {
+           "by": "natural-order"
+          }
+         },
+         "displayName": "Par nombre de projets"
+        },
+        "y": {
+         "fieldName": "taux",
+         "scale": {
+          "type": "quantitative"
+         },
+         "format": {
+          "type": "number-percent",
+          "decimalPlaces": {
+           "type": "max",
+           "places": 1
+          }
+         },
+         "displayName": "Taux de départ"
+        },
+        "extra": [
+         {
+          "fieldName": "n",
+          "displayName": "Employés"
+         }
+        ],
+        "label": {
+         "show": true
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Par nombre de projets"
+       },
+       "mark": {
+        "colors": [
+         "#2a78d6"
+        ]
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 7,
+      "width": 2,
+      "height": 6
+     }
+    },
+    {
+     "widget": {
+      "name": "b2",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "heures",
+           "expression": "`heures`"
+          },
+          {
+           "name": "taux",
+           "expression": "AVG(`has_left`)"
+          },
+          {
+           "name": "n",
+           "expression": "COUNT(`*`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 3,
+       "widgetType": "bar",
+       "encodings": {
+        "x": {
+         "fieldName": "heures",
+         "scale": {
+          "type": "categorical",
+          "sort": {
+           "by": "natural-order"
+          }
+         },
+         "displayName": "Par heures par mois"
+        },
+        "y": {
+         "fieldName": "taux",
+         "scale": {
+          "type": "quantitative"
+         },
+         "format": {
+          "type": "number-percent",
+          "decimalPlaces": {
+           "type": "max",
+           "places": 1
+          }
+         },
+         "displayName": "Taux de départ"
+        },
+        "extra": [
+         {
+          "fieldName": "n",
+          "displayName": "Employés"
+         }
+        ],
+        "label": {
+         "show": true
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Par heures par mois"
+       },
+       "mark": {
+        "colors": [
+         "#2a78d6"
+        ]
+       }
+      }
+     },
+     "position": {
+      "x": 2,
+      "y": 7,
+      "width": 2,
+      "height": 6
+     }
+    },
+    {
+     "widget": {
+      "name": "b3",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "annees",
+           "expression": "`annees`"
+          },
+          {
+           "name": "taux",
+           "expression": "AVG(`has_left`)"
+          },
+          {
+           "name": "n",
+           "expression": "COUNT(`*`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 3,
+       "widgetType": "bar",
+       "encodings": {
+        "x": {
+         "fieldName": "annees",
+         "scale": {
+          "type": "categorical",
+          "sort": {
+           "by": "natural-order"
+          }
+         },
+         "displayName": "Par années dans l'entreprise"
+        },
+        "y": {
+         "fieldName": "taux",
+         "scale": {
+          "type": "quantitative"
+         },
+         "format": {
+          "type": "number-percent",
+          "decimalPlaces": {
+           "type": "max",
+           "places": 1
+          }
+         },
+         "displayName": "Taux de départ"
+        },
+        "extra": [
+         {
+          "fieldName": "n",
+          "displayName": "Employés"
+         }
+        ],
+        "label": {
+         "show": true
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Par années dans l'entreprise"
+       },
+       "mark": {
+        "colors": [
+         "#2a78d6"
+        ]
+       }
+      }
+     },
+     "position": {
+      "x": 4,
+      "y": 7,
+      "width": 2,
+      "height": 6
+     }
+    },
+    {
+     "widget": {
+      "name": "nuage",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "satisfaction_level",
+           "expression": "`satisfaction_level`"
+          },
+          {
+           "name": "last_evaluation",
+           "expression": "`last_evaluation`"
+          },
+          {
+           "name": "statut",
+           "expression": "`statut`"
+          },
+          {
+           "name": "n",
+           "expression": "COUNT(`*`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 3,
+       "widgetType": "scatter",
+       "encodings": {
+        "x": {
+         "fieldName": "satisfaction_level",
+         "scale": {
+          "type": "quantitative"
+         },
+         "displayName": "Satisfaction"
+        },
+        "y": {
+         "fieldName": "last_evaluation",
+         "scale": {
+          "type": "quantitative"
+         },
+         "displayName": "Évaluation"
+        },
+        "color": {
+         "fieldName": "statut",
+         "displayName": "Statut",
+         "scale": {
+          "type": "categorical",
+          "mappings": [
+           {
+            "value": "Resté",
+            "color": "#2a78d6"
+           },
+           {
+            "value": "Parti",
+            "color": "#eb6834"
+           }
+          ]
+         }
+        },
+        "size": {
+         "fieldName": "n",
+         "scale": {
+          "type": "quantitative"
+         },
+         "displayName": "Employés"
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Satisfaction et évaluation : les profils cachés"
+       }
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 13,
+      "width": 3,
+      "height": 8
+     }
+    },
+    {
+     "widget": {
+      "name": "profils",
+      "queries": [
+       {
+        "name": "main_query",
+        "query": {
+         "datasetName": "emp",
+         "disaggregated": false,
+         "fields": [
+          {
+           "name": "profil",
+           "expression": "`profil`"
+          },
+          {
+           "name": "partis",
+           "expression": "SUM(`has_left`)"
+          },
+          {
+           "name": "taux",
+           "expression": "AVG(`has_left`)"
+          }
+         ]
+        }
+       }
+      ],
+      "spec": {
+       "version": 3,
+       "widgetType": "bar",
+       "encodings": {
+        "x": {
+         "fieldName": "taux",
+         "scale": {
+          "type": "quantitative"
+         },
+         "format": {
+          "type": "number-percent",
+          "decimalPlaces": {
+           "type": "max",
+           "places": 1
+          }
+         },
+         "displayName": "Taux de départ"
+        },
+        "y": {
+         "fieldName": "profil",
+         "scale": {
+          "type": "categorical",
+          "sort": {
+           "by": "x-reversed"
+          }
+         },
+         "displayName": "Profil"
+        },
+        "extra": [
+         {
+          "fieldName": "partis",
+          "displayName": "Partis"
+         }
+        ],
+        "label": {
+         "show": true
+        }
+       },
+       "frame": {
+        "showTitle": true,
+        "title": "Taux de départ par profil"
+       },
+       "mark": {
+        "colors": [
+         "#eb6834"
+        ]
+       }
+      }
+     },
+     "position": {
+      "x": 3,
+      "y": 13,
+      "width": 3,
+      "height": 8
+     }
+    },
+    {
+     "widget": {
+      "name": "note",
+      "multilineTextboxSpec": {
+       "lines": [
+        "**Attention :** ce sont des liens, pas des causes. Une ligne sur cinq est une copie exacte d'une autre : sans les copies, le taux de départ est de 16,1 % au lieu de 23,8 %. Les limites des profils ont été tracées à l'œil."
+       ]
+      }
+     },
+     "position": {
+      "x": 0,
+      "y": 21,
+      "width": 6,
+      "height": 2
+     }
+    }
+   ]
+  }
+ ]
+}
