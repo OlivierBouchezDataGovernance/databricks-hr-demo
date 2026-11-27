@@ -17,6 +17,8 @@ Vous allez : explorer des données, dessiner des graphiques, nettoyer des fichie
 
 N'y mettez pas de données personnelles ni de données de votre entreprise.
 
+*Testé sur la Free Edition le 27 novembre 2026 : installation, notebooks 08 et 10, et **Visual data prep** disponible dans le menu **+ New**.*
+
 ## 2. Copier ce projet dans Databricks (Git folder)
 
 Un **clone** est une copie du projet, reliée à GitHub. Aucun compte GitHub n'est nécessaire si ce dépôt est public.
